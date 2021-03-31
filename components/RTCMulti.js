@@ -2586,6 +2586,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             peer.getLocalStreams = function() {
                 var stream = new MediaStream();
                 peer.getSenders().forEach(function(sender) {
+                    console.log('sender');
                     stream.addTrack(sender.track);
                 });
                 return [stream];

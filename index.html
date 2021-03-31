@@ -10,13 +10,13 @@
       <script src="https://unpkg.com/aframe-template-component@^3.1.1/dist/aframe-template-component.min.js"></script> 
       <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
       <script src="https://unpkg.com/aframe-firebase-component@^4.0.0/dist/aframe-firebase-component.min.js"></script> 
-      <script src="https://unpkg.com/lz-string@1.4.4/libs/lz-string.min.js"></script>
       <!-- <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script> -->
       <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
       <script src="./components/random-position-at.js"></script>
       <script src="./components/navigator.js"></script>
       <script src="./components/dirty-sanitise.js"></script>
       <script src="./components/RTCMulti.js"></script>
+      <script src="components/raise-the-roof.js"></script>
       <style>
          #splash {
          position: fixed;
@@ -62,7 +62,7 @@
          font-size: 28px;
          color: #848484;
          }
-         .fullscreen-button {
+         .fullscreen-button, .raise-roof-button {
          background-color:#44c767;
          border-radius:28px;
          border:1px solid #18ab29;
@@ -79,7 +79,11 @@
          bottom: 20px;
          z-index: 199;
          }
-         .fullscreen-button:hover {
+
+         .raise-roof-button {
+           bottom: 100px;
+         }
+         .fullscreen-button:hover, .raise-roof-button:hover {
          background-color:#5cbf2a;
          }
          .backdrop {
@@ -112,6 +116,7 @@
       </script>
       <div class="backdrop hidden"></div>
       <div id="fullscreen-button" class="fullscreen-button">Fullscreen</div>
+      <div id="raise" class="raise-roof-button">Raise the Roof!</div>
       <div id="splash">
          <img class="logo" border="0" src="https://assets.wakelet.com/logo/wklt-blue.svg">
          <div class="room-name">
@@ -175,9 +180,10 @@
            databaseURL: https://wakelet-rt-default-rtdb.firebaseio.com;
            storageBucket: wakelet-rt.appspot.com">`);
       </script>
-      <video id="webcam" playsinline crossorigin="anonymous" class="hidden"></video>
+      <video id="webcam" poster="components/presentation-end.png" playsinline crossorigin="anonymous" class="hidden"></video>
       <a-assets>
          <!-- Images. -->
+         <img id="ended" src="/components/presentation-end.png">
          <!-- Mixins. -->
          <a-mixin id="avatar"
             geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
@@ -190,7 +196,8 @@
             material="shader: flat; side: double"></a-mixin>
          <a-mixin id="poster"
             geometry="primitive: box; depth: 0.02; height: 2; width: 2"
-            material="side: double; shader: flat; transparent: true">
+          
+            material="side: double; shader: flat; transparent: true; src: #ended;">
          </a-mixin>
          <!-- Templates. -->
          <script id="avatar-template" type="text/html-template">
@@ -247,7 +254,7 @@
       </a-assets>
       <!-- Avatar. -->
       <a-entity id="rig" random-position-at="selector: .chair; offset: 0 1.4 0.2"
-         firebase-broadcast="components: position, rotation" rotation="0 180 0">
+         firebase-broadcast="components: position, raise-the-roof, rotation" raise-the-roof="false" rotation="0 180 0">
          <a-camera id="camera" position="0 0 0" wasd-controls-enabled="false"></a-camera>
          <a-entity id="head" mixin="avatar"
             rotation="0 180 0" 

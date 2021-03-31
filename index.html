@@ -14,6 +14,7 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/rtcmulticonnection@3.7.0/dist/RTCMultiConnection.min.js"></script> -->
     <script src="./components/random-position-at.js"></script>
     <script src="./components/navigator.js"></script>
+    <script src="./components/dirty-sanitise.js"></script>
   </head>
   <body></body>
     <script>
@@ -39,15 +40,16 @@
     };
       connection.join(window.config.room);
     }
-
       
 
-
-    </script>
-    <a-scene vr-mode-ui="enabled: false" debug firebase="apiKey: AIzaSyAUbabNv-KABpJi8xsQzCCunm_zK7GCmhQ;
+      const sanitisedRoomName = window.utils.removeTags(window.config.room)
+        document.write(`<a-scene vr-mode-ui="enabled: false" debug firebase="apiKey: AIzaSyAUbabNv-KABpJi8xsQzCCunm_zK7GCmhQ;
     authDomain: wakelet-rt.firebaseapp.com;
+    channel: ${sanitisedRoomName};
     databaseURL: https://wakelet-rt-default-rtdb.firebaseio.com;
-    storageBucket: wakelet-rt.appspot.com">
+    storageBucket: wakelet-rt.appspot.com">`);
+    </script>
+  
         
       <a-assets>
         <!-- Images. -->

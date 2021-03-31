@@ -137,6 +137,10 @@
          
          if (window.config.owner == "true") {
            console.log('IS OWNER');
+           connection.sdpConstraints.mandatory = {
+           OfferToReceiveAudio: false,
+           OfferToReceiveVideo: false
+         };
          connection.open(window.config.room);
          } else {
          console.log('Not the owner');
@@ -244,7 +248,7 @@
       <!-- Avatar. -->
       <a-entity id="rig" random-position-at="selector: .chair; offset: 0 1.4 0.2"
          firebase-broadcast="components: position, rotation" rotation="0 180 0">
-         <a-camera id="camera" position="0 0 0" ></a-camera>
+         <a-camera id="camera" position="0 0 0" wasd-controls-enabled="false"></a-camera>
          <a-entity id="head" mixin="avatar"
             rotation="0 180 0" 
             look-controls firebase-broadcast="componentsOnce: mixin;

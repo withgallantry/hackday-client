@@ -7,8 +7,7 @@ window.getRoomProperties = () => {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const presentation = urlParams.get('presentation');
-    const buff = Buffer(presentation, 'base64');
-    const decompressed = buff.toString('ascii')
+    const decompressed = atob(presentation)
     console.log(decompressed)
     const config = JSON.parse(decompressed);
     return config;

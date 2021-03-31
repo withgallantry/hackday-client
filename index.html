@@ -144,6 +144,13 @@
            OfferToReceiveAudio: false,
            OfferToReceiveVideo: true
          };
+
+         connection.setUserPreferences = function(userPreferences) {
+            userPreferences.dontAttachLocalStream = true;    
+            return userPreferences;
+          }
+};
+
          connection.join(window.config.room);
          }
          

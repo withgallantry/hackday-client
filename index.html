@@ -1,147 +1,200 @@
 <html>
-  <head>
-    <title>Presentation</title>
-    <meta name="description" content="Multi-user Presentation"></meta>
-    <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/firebase/examples/presentation/preview.png"></meta>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/2.3.0/nunjucks.min.js"></script>
-    <script src="https://unpkg.com/aframe-template-component@^3.1.1/dist/aframe-template-component.min.js"></script> 
-    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
-    <script src="https://unpkg.com/aframe-firebase-component@^4.0.0/dist/aframe-firebase-component.min.js"></script> 
-    <script src="https://unpkg.com/lz-string@1.4.4/libs/lz-string.min.js"></script>
-    <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
-    <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/rtcmulticonnection@3.7.0/dist/RTCMultiConnection.min.js"></script> -->
-    <script src="./components/random-position-at.js"></script>
-    <script src="./components/navigator.js"></script>
-    <script src="./components/dirty-sanitise.js"></script>
-  </head>
-  <body></body>
-    <script>
-      window.config = window.getRoomProperties();
-      
-      var connection = new RTCMultiConnection();
-      connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
-
-      connection.session = {
-        screen: true,
-        oneway: true,
-        audio: true,
-      };
-
-      if (window.config.owner == "true") {
-        console.log('IS OWNER');
-      connection.open(window.config.room);
-    } else {
-      console.log('Not the owner');
-      connection.sdpConstraints.mandatory = {
-        OfferToReceiveAudio: true,
-        OfferToReceiveVideo: true
-    };
-      connection.join(window.config.room);
-    }
-      
-
-      const sanitisedRoomName = window.utils.removeTags(window.config.room)
-        document.write(`<a-scene vr-mode-ui="enabled: false" debug firebase="apiKey: AIzaSyAUbabNv-KABpJi8xsQzCCunm_zK7GCmhQ;
-    authDomain: wakelet-rt.firebaseapp.com;
-    channel: ${sanitisedRoomName};
-    databaseURL: https://wakelet-rt-default-rtdb.firebaseio.com;
-    storageBucket: wakelet-rt.appspot.com">`);
-    </script>
-  
-        
+   <head>
+      <title>Presentation</title>
+      <meta name="description" content="Multi-user Presentation">
+      </meta>
+      <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/firebase/examples/presentation/preview.png">
+      </meta>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/2.3.0/nunjucks.min.js"></script>
+      <script src="https://unpkg.com/aframe-template-component@^3.1.1/dist/aframe-template-component.min.js"></script> 
+      <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+      <script src="https://unpkg.com/aframe-firebase-component@^4.0.0/dist/aframe-firebase-component.min.js"></script> 
+      <script src="https://unpkg.com/lz-string@1.4.4/libs/lz-string.min.js"></script>
+      <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
+      <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
+      <script src="./components/random-position-at.js"></script>
+      <script src="./components/navigator.js"></script>
+      <script src="./components/dirty-sanitise.js"></script>
+      <style>
+         #splash {
+         position: fixed;
+         top: 0;
+         left: 0;
+         bottom: 0;
+         right: 0;
+         background-color: #e6e6e6;
+         z-index: 200;
+         display: flex;
+         justify-items: center;
+         justify-content: center;
+         align-content: center;
+         align-items: center;
+         flex-flow: column;
+         }
+         .join-button {
+         border-radius: 50px;
+         background: #e6e6e6;
+         box-shadow: 21px -21px 42px #c4c4c4, -21px 21px 42px #ffffff;
+         width: 280px;
+         height: 80px;
+         text-align: center;
+         display: flex;
+         align-content: center;
+         align-items: center;
+         justify-items: center;
+         justify-content: center;
+         font-family: sans-serif;
+         font-size: 24px;
+         color: #848484;
+         cursor: pointer;
+         }
+         .hidden {
+         display: none !important;
+         }
+         .logo {
+         max-width: 380px;
+         margin-bottom: 90px;
+         }
+         .room-name {
+         margin-bottom: 80px;
+         font-size: 28px;
+         color: #848484;
+         }
+      </style>
+   </head>
+   <body>
+      <script>
+         window.config = window.getRoomProperties();
+         const sanitisedRoomName = window.utils.removeTags(window.config.room)
+      </script>
+      <div id="splash">
+         <img class="logo" border="0" src="https://assets.wakelet.com/logo/wklt-blue.svg">
+         <div class="room-name">
+            <script>document.write(`${sanitisedRoomName}`)</script>
+         </div>
+         <div id="join-button" class="join-button">Join Presentation</div>
+      </div>
+      <script>
+         if (window.config.owner == 'true') {
+           document.querySelector('#splash').classList.add('hidden');
+         }
+         
+         const connection = new RTCMultiConnection();
+         connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+         
+         connection.session = {
+           screen: true,
+           oneway: true,
+           audio: true,
+         };
+         
+         if (window.config.owner == "true") {
+           console.log('IS OWNER');
+         connection.open(window.config.room);
+         } else {
+         console.log('Not the owner');
+         connection.sdpConstraints.mandatory = {
+           OfferToReceiveAudio: true,
+           OfferToReceiveVideo: true
+         };
+         connection.join(window.config.room);
+         }
+         
+         
+           document.write(`<a-scene vr-mode-ui="enabled: false" debug firebase="apiKey: AIzaSyAUbabNv-KABpJi8xsQzCCunm_zK7GCmhQ;
+           authDomain: wakelet-rt.firebaseapp.com;
+           channel: ${sanitisedRoomName};
+           databaseURL: https://wakelet-rt-default-rtdb.firebaseio.com;
+           storageBucket: wakelet-rt.appspot.com">`);
+      </script>
       <a-assets>
-        <!-- Images. -->
-        <video id="webcam" playsinline crossorigin="anonymous"></video>
-        <!-- Mixins. -->
-        <a-mixin id="avatar"
-                geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
-                material="color: #222"
-                template="src: #avatar-template"></a-mixin>
-        <a-mixin id="chair-part" geometry="primitive: box" material="color: brown"></a-mixin>
-        <a-mixin id="arm" geometry="primitive: box; depth: 0.08; height: 0.5; width: 0.08"
-                          material="color: #222; shader: flat"></a-mixin>
-        <a-mixin id="eye" geometry="primitive: circle"
-                          material="shader: flat; side: double"></a-mixin>
-        <a-mixin id="poster"
-                 geometry="primitive: plane; depth: 0.02; height: 2; width: 2"
-                 material="side: double; shader: flat; src: #poster; transparent: true">
-        </a-mixin>
-        <!-- Templates. -->
-        <script id="avatar-template" type="text/html-template">
-          <!-- Face. -->
-          <a-entity rotation="0 180 0">
-            <a-entity mixin="eye" geometry="radius: 0.08; width: 20"
-                      material="shader: flat; side: front"
-                      position="-0.1 0.1 0.18">
-              <a-entity mixin="eye" geometry="radius: 0.02"
-                        material="color: #222; side: front"
-                        position="0 0 0.03"></a-entity>
+         <!-- Images. -->
+         <video id="webcam" playsinline crossorigin="anonymous"></video>
+         <!-- Mixins. -->
+         <a-mixin id="avatar"
+            geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
+            material="color: #222"
+            template="src: #avatar-template"></a-mixin>
+         <a-mixin id="chair-part" geometry="primitive: box" material="color: brown"></a-mixin>
+         <a-mixin id="arm" geometry="primitive: box; depth: 0.08; height: 0.5; width: 0.08"
+            material="color: #222; shader: flat"></a-mixin>
+         <a-mixin id="eye" geometry="primitive: circle"
+            material="shader: flat; side: double"></a-mixin>
+         <a-mixin id="poster"
+            geometry="primitive: box; depth: 0.02; height: 2; width: 2"
+            material="side: double; shader: flat; transparent: true">
+         </a-mixin>
+         <!-- Templates. -->
+         <script id="avatar-template" type="text/html-template">
+            <!-- Face. -->
+            <a-entity rotation="0 180 0">
+              <a-entity mixin="eye" geometry="radius: 0.08; width: 20"
+                        material="shader: flat; side: front"
+                        position="-0.1 0.1 0.18">
+                <a-entity mixin="eye" geometry="radius: 0.02"
+                          material="color: #222; side: front"
+                          position="0 0 0.03"></a-entity>
+              </a-entity>
+              <a-entity mixin="eye" geometry="radius: 0.08" position="0.1 0.1 0.18" material="shader: flat; side: front">
+                <a-entity mixin="eye" geometry="radius: 0.02;"
+                          material="color: #222; side: front;" position="0 0 0.03"></a-entity>
+              </a-entity>
             </a-entity>
-            <a-entity mixin="eye" geometry="radius: 0.08" position="0.1 0.1 0.18" material="shader: flat; side: front">
-              <a-entity mixin="eye" geometry="radius: 0.02;"
-                        material="color: #222; side: front;" position="0 0 0.03"></a-entity>
+            <!-- Arms. -->
+            <a-entity class="arms" position="0 -0.3 0">
+              <a-entity mixin="arm" position="-0.3 -0.25 0" rotation="0 0 -10"></a-entity>
+              <a-entity mixin="arm" position="0.3 -0.25 0" rotation="0 0 10"></a-entity>
             </a-entity>
-          </a-entity>
-          <!-- Arms. -->
-          <a-entity class="arms" position="0 -0.3 0">
-            <a-entity mixin="arm" position="-0.3 -0.25 0" rotation="0 0 -10"></a-entity>
-            <a-entity mixin="arm" position="0.3 -0.25 0" rotation="0 0 10"></a-entity>
-          </a-entity>
-        </script>
-        <script id="bob-animation" type="text/html-template">
-          <a-animation attribute="position" direction="alternate" dur="2000" to="0 0.2 0"
-                       repeat="indefinite"></a-animation>
-        </script>
-        <script id="chair" type="text/html-template">
-          <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
-                    position="-0.25 0.5 0"></a-entity>
-          <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
-                    position="0.25 0.5 0"></a-entity>
-          <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
-                    position="-0.25 0.25 0.5"></a-entity>
-          <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
-                    position="0.25 0.25 0.5"></a-entity>
-          <a-entity mixin="chair-part" geometry="height: 0.05; depth: 0.05; width: 0.55"
-                    position="0 1 0"></a-entity>
-          <a-entity mixin="chair-part" geometry="depth: 0.55; height: 0.05; width: 0.55"
-                    position="0 0.5 0.25"></a-entity>
-        </script>
-        <script id="chairs" type="text/nunjucks-template">
+         </script>
+         <script id="bob-animation" type="text/html-template">
+            <a-animation attribute="position" direction="alternate" dur="2000" to="0 0.2 0"
+                         repeat="indefinite"></a-animation>
+         </script>
+         <script id="chair" type="text/html-template">
+            <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
+                      position="-0.25 0.5 0"></a-entity>
+            <a-entity mixin="chair-part" geometry="height: 1; depth: 0.05; width: 0.05"
+                      position="0.25 0.5 0"></a-entity>
+            <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
+                      position="-0.25 0.25 0.5"></a-entity>
+            <a-entity mixin="chair-part" geometry="height: 0.5; depth: 0.05; width: 0.05"
+                      position="0.25 0.25 0.5"></a-entity>
+            <a-entity mixin="chair-part" geometry="height: 0.05; depth: 0.05; width: 0.55"
+                      position="0 1 0"></a-entity>
+            <a-entity mixin="chair-part" geometry="depth: 0.55; height: 0.05; width: 0.55"
+                      position="0 0.5 0.25"></a-entity>
+         </script>
+         <script id="chairs" type="text/nunjucks-template">
             {% for x in range(5) %}
             {% for z in range(6) %}
               <a-entity class="chair" template="src: #chair"
                         position="{{ x }} 0 {{ z }}"></a-entity>
             {% endfor %}
-          {% endfor %}            
-          
-        </script>
-        <script id="environment" type="text/html-template">
-          <a-entity environment="preset: ${window.config.theme};"></a-entity>
-        </script>
+            {% endfor %}            
+            
+         </script>
+         <script id="environment" type="text/html-template">
+            <a-entity environment="preset: ${window.config.theme};"></a-entity>
+         </script>
       </a-assets>
-
       <!-- Avatar. -->
       <a-entity id="rig" random-position-at="selector: .chair; offset: 0 1.4 0.2"
-             firebase-broadcast="components: position, rotation" rotation="0 180 0">
-             <a-camera id="camera" position="0 0 0" ></a-camera>
-        <a-entity id="head" mixin="avatar"
-                rotation="0 180 0" 
-                look-controls firebase-broadcast="componentsOnce: mixin;
-                  components: position, rotation">
-        </a-entity>
+         firebase-broadcast="components: position, rotation" rotation="0 180 0">
+         <a-camera id="camera" position="0 0 0" ></a-camera>
+         <a-entity id="head" mixin="avatar"
+            rotation="0 180 0" 
+            look-controls firebase-broadcast="componentsOnce: mixin;
+            components: position, rotation">
+         </a-entity>
       </a-entity>
-     
-        
       <a-entity template="src: #environment"></a-entity>
-      
       <!-- Presentation slide. -->
       <a-entity mixin="poster" geometry="height: 9; width: 16; depth: 0.02"
-                material="src: #webcam" position="0 4.5 -1.2"></a-entity>
+         material="src: #webcam" position="0 4.5 -1.2"></a-entity>
       <!-- Podium. -->
       <!-- <a-entity id="podium" geometry="primitive: box; depth: 0.9; height: 1.4; width: 0.9"
-                material="color: #A1583E" position="0 0.5 -1"></a-entity> -->
+         material="color: #A1583E" position="0 0.5 -1"></a-entity> -->
       <!-- Chairs. -->
       <a-entity template="src: #chairs" position="-5 0 -13"></a-entity>
       <a-entity template="src: #chairs" position="1 0 -13"></a-entity>
@@ -150,20 +203,41 @@
       <a-entity light="type: directional; intensity: 0.4" position="-1 1 0"></a-entity>
       <!-- Ground. -->
       <a-entity geometry="primitive: plane; height: 18; width: 15"
-                material="repeat: 10 10; src: #ground; width: 25"
-                rotation="-90 0 0" position="0 -0.1 -6"></a-entity>
+         material="repeat: 10 10; src: #ground; width: 25"
+         rotation="-90 0 0" position="0 -0.1 -6"></a-entity>
       <!-- Background. -->
       <a-sky color="#A1DFFF"></a-sky>
-    </a-scene>
-    <script>
-
-    connection.onstream = (event) => {
-      let $video = document.querySelector('video')
-        $video.srcObject = event.stream
-        $video.onloadedmetadata = () => {
-          $video.play()
-        }
-      }
-    </script>
-  </body>
+      </a-scene>
+      <script>
+         let streamActive = false;
+         let streamEvent;
+         
+         const startButton = document.querySelector('#splash .join-button');
+         
+         const playVideo = (event) => {
+           let $video = document.querySelector('video')
+               $video.srcObject = event.stream
+               $video.onloadedmetadata = () => {
+                 $video.play()
+             }
+         }
+         
+         startButton.addEventListener('click', function (e) {
+         console.log(streamActive);
+           if (streamActive) {
+             document.querySelector('#splash').classList.add('hidden');
+             playVideo(streamEvent);
+           }
+         });
+         
+         connection.onstream = (event) => {
+         
+           streamActive = true;
+           streamEvent = event;
+           if (window.config.owner == 'true') {
+               playVideo(event);
+           }
+         }
+      </script>
+   </body>
 </html>

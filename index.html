@@ -111,7 +111,8 @@
          <div class="room-name">
             <script>document.write(`${sanitisedRoomName}`)</script>
          </div>
-         <div id="join-button" class="join-button">Join Presentation</div>
+         <div id="no-stream">No presentation currently</div>
+         <div id="join-button" class="hidden join-button">Join Presentation</div>
       </div>
       <script>
          if (window.config.owner == 'true') {
@@ -146,10 +147,10 @@
            databaseURL: https://wakelet-rt-default-rtdb.firebaseio.com;
            storageBucket: wakelet-rt.appspot.com">`);
       </script>
-      <video id="webcam" playsinline crossorigin="anonymous" class="hidden"></video>
       <a-assets>
          <!-- Images. -->
          <!-- Mixins. -->
+         <video id="webcam" playsinline crossorigin="anonymous" class="hidden"></video>
          <a-mixin id="avatar"
             geometry="primitive: box; depth: 0.3; height: 0.3; width: 0.3"
             material="color: #222"

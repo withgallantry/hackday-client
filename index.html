@@ -131,15 +131,22 @@
          }
          
          const connection = new RTCMultiConnection();
+         const connectionAvatarFaceWebcam = new RTCMultiConnection();
          connection.autoCreateMediaElement = false;
          connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
-         
+         connectionAvatarFaceWebcam.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+
          connection.session = {
            screen: true,
            oneway: true,
            audio: false,
          };
-         
+         connectionAvatarFaceWebcam.session = {
+            oneway: true,
+            audio: true,
+            video: true
+         };
+
          if (window.config.owner == "true") {
            console.log('IS OWNER');
            connection.sdpConstraints.mandatory = {
@@ -147,14 +154,23 @@
            OfferToReceiveVideo: false
          };
          connection.open(window.config.room);
+         connectionAvatarFaceWebcam.open(window.config.room);
          } else {
          console.log('Not the owner');
          connection.sdpConstraints.mandatory = {
            OfferToReceiveAudio: false,
            OfferToReceiveVideo: true
          };
+         connection.join(window.config.room);
 
-        
+         connectionAvatarFaceWebcam.sdpConstraints.mandatory = {
+            OfferToReceiveAudio: true,
+            OfferToReceiveVideo: true
+         };
+         connectionAvatarFaceWebcam.join(window.config.room);
+
+
+
          connection.setUserPreferences = function(userPreferences) {
     if (window.config.owner == 'false') {
     	// current user's streams will NEVER be shared with any other user
@@ -172,7 +188,7 @@
 	},
          });
          }
-         
+
          
            document.write(`<a-scene vr-mode-ui="enabled: false" debug firebase="apiKey: AIzaSyAUbabNv-KABpJi8xsQzCCunm_zK7GCmhQ;
            authDomain: wakelet-rt.firebaseapp.com;
@@ -181,6 +197,7 @@
            storageBucket: wakelet-rt.appspot.com">`);
       </script>
       <video id="webcam" poster="components/presentation-end.png" playsinline crossorigin="anonymous" class="hidden"></video>
+      <video id="webcam_2" playsinline crossorigin="anonymous" class="hidden"></video>
       <a-assets>
          <!-- Images. -->
          <img id="ended" src="/components/presentation-end.png">
@@ -196,7 +213,7 @@
             material="shader: flat; side: double"></a-mixin>
          <a-mixin id="poster"
             geometry="primitive: box; depth: 0.02; height: 2; width: 2"
-          
+
             material="side: double; shader: flat; transparent: true; src: #ended;">
          </a-mixin>
          <!-- Templates. -->
@@ -214,6 +231,12 @@
                 <a-entity mixin="eye" geometry="radius: 0.02;"
                           material="color: #222; side: front;" position="0 0 0.03"></a-entity>
               </a-entity>
+               <!-- Face Video -->
+               <a-entity geometry="primitive: plane; height: 0.2; width: 0.2; depth: 0.2"
+                         position="0 0 0.2"
+                         material="src: #webcam_2; side: front"
+                         rotation="0 0 0"
+               ></a-entity>
             </a-entity>
             <!-- Arms. -->
             <a-entity class="arms" position="0 -0.3 0">
@@ -266,6 +289,13 @@
       <!-- Presentation slide. -->
       <a-entity mixin="poster" geometry="height: 9; width: 16; depth: 0.02"
          material="src: #webcam" position="0 4.5 -1.2"></a-entity>
+      <!-- Presenter podium webcam video -->
+      <a-entity geometry="primitive: plane; height: 3; width: 8; depth: 0.02"
+                position="11 4.5 -1"
+                material="src: #webcam_2; side: double"
+                rotation="0 180 0"
+      ></a-entity>
+
       <!-- Podium. -->
       <!-- <a-entity id="podium" geometry="primitive: box; depth: 0.9; height: 1.4; width: 0.9"
          material="color: #A1583E" position="0 0.5 -1"></a-entity> -->
@@ -285,8 +315,12 @@
       <script>
          let streamActive = false;
          let streamEvent;
+
+         let streamAvatarFaceWebcamActive = false;
+         let streamAvatarFaceWebcamEvent;
          const $video = document.querySelector('#webcam');
-         
+         const $video_2 = document.querySelector('#webcam_2');
+
          const startButton = document.querySelector('#splash .join-button');
          const fullscreenButton = document.querySelector('#fullscreen-button');
          
@@ -296,12 +330,23 @@
                  $video.play()
              }
          }
-         
+
+         const playVideo_2 = (event) => {
+            $video_2.srcObject = event.stream
+            $video_2.onloadedmetadata = () => {
+               $video_2.play()
+            }
+         }
+
          startButton.addEventListener('click', function (e) {
            if (streamActive) {
              document.querySelector('#splash').classList.add('hidden');
              playVideo(streamEvent);
            }
+            if (streamAvatarFaceWebcamActive) {
+               document.querySelector('#splash').classList.add('hidden');
+               playVideo_2(streamAvatarFaceWebcamEvent);
+            }
          });
          
          fullscreenButton.addEventListener('click', function (e) {
@@ -328,6 +373,16 @@
            if (window.config.owner == 'true') {
                playVideo(event);
            }
+         }
+
+         connectionAvatarFaceWebcam.onstream = (event) => {
+            document.querySelector('#no-stream').classList.add('hidden');
+            startButton.classList.remove('hidden');
+            streamAvatarFaceWebcamActive = true;
+            streamAvatarFaceWebcamEvent = event;
+            if (window.config.owner == 'true') {
+               playVideo_2(event);
+            }
          }
       </script>
    </body>

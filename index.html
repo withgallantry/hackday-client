@@ -125,12 +125,13 @@
          }
          
          const connection = new RTCMultiConnection();
+         connection.autoCreateMediaElement = false;
          connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
          
          connection.session = {
            screen: true,
            oneway: true,
-           audio: true,
+           audio: false,
          };
          
          if (window.config.owner == "true") {
@@ -139,7 +140,7 @@
          } else {
          console.log('Not the owner');
          connection.sdpConstraints.mandatory = {
-           OfferToReceiveAudio: true,
+           OfferToReceiveAudio: false,
            OfferToReceiveVideo: true
          };
          connection.join(window.config.room);

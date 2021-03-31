@@ -83,6 +83,16 @@
 	background-color:#5cbf2a;
 }
 
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 197;
+}
+
 .fullscreen {
   position: fixed;
   width: 100%;
@@ -98,6 +108,7 @@
          window.config = window.getRoomProperties();
          const sanitisedRoomName = window.utils.removeTags(window.config.room)
       </script>
+      <div class="backdrop hidden"></div>
       <div id="fullscreen-button" class="fullscreen-button">Fullscreen</div>
       <div id="splash">
          <img class="logo" border="0" src="https://assets.wakelet.com/logo/wklt-blue.svg">
@@ -266,11 +277,13 @@
            
               document.querySelector('#webcam').classList.add('fullscreen');
               document.querySelector('#webcam').classList.remove('hidden');
+              document.querySelector('.backdrop').classList.remove('hidden');
               fullscreenButton.textContent = 'Exit';
            } else {
       
             document.querySelector('#webcam').classList.remove('fullscreen');
               document.querySelector('#webcam').classList.add('hidden');
+              document.querySelector('.backdrop').classList.add('hidden');
               fullscreenButton.textContent = 'Fullscreen';
            }
          });

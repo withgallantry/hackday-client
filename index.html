@@ -145,13 +145,7 @@
            OfferToReceiveVideo: true
          };
 
-         connection.socketOptions = {
-	'force new connection': true, // For SocketIO version < 1.0
-	'forceNew': true, // For SocketIO version >= 1.0
-	'transport': 'polling' // fixing transport:unknown issues
-};
-         
-
+        
          connection.setUserPreferences = function(userPreferences) {
     if (window.config.owner == 'false') {
     	// current user's streams will NEVER be shared with any other user
@@ -162,7 +156,12 @@
     return userPreferences;
 };
 
-         connection.join(window.config.room);
+         connection.join(window.config.room, {
+          localPeerSdpConstraints: {
+		OfferToReceiveAudio: false,
+		OfferToReceiveVideo: false
+	},
+         });
          }
          
          

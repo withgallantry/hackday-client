@@ -3,13 +3,14 @@
       <title>Presentation</title>
       <meta name="description" content="Multi-user Presentation">
       </meta>
-      <meta property="og:image" content="https://raw.githubusercontent.com/supermedium/superframe/master/components/firebase/examples/presentation/preview.png">
+      <meta property="og:image" content="https://wk-presentation.netlify.app/presentation.png">
       </meta>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/2.3.0/nunjucks.min.js"></script>
       <script src="https://unpkg.com/aframe-template-component@^3.1.1/dist/aframe-template-component.min.js"></script> 
       <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
       <script src="https://unpkg.com/aframe-firebase-component@^4.0.0/dist/aframe-firebase-component.min.js"></script> 
+      <script src="https://unpkg.com/aframe-look-at-component@1.0.0/dist/aframe-look-at-component.min.js"></script>
       <!-- <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script> -->
       <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
       <script src="./components/random-position-at.js"></script>
@@ -17,7 +18,11 @@
       <script src="./components/dirty-sanitise.js"></script>
       <script src="./components/RTCMulti.js"></script>
       <script src="components/raise-the-roof.js"></script>
+      <script src="components/person-name.js"></script>
       <style>
+        body {
+          font-family: "system-ui";
+        }
          #splash {
          position: fixed;
          top: 0;
@@ -105,8 +110,22 @@
 
          #no-stream {
           font-size: 24px;
-          font-family: sans-serif;
+          font-family: "system-ui";
+          height: 80px;
          }
+         .textbox { 
+    border: 1px solid #848484; 
+    -webkit-border-radius: 30px; 
+    -moz-border-radius: 30px; 
+    border-radius: 30px; 
+    outline:0; 
+    height:36px; 
+    width: 275px; 
+    font-size: 24px;
+    margin-bottom: 60px;
+    padding-left:10px; 
+    padding-right:10px; 
+  } 
       </style>
    </head>
    <body>
@@ -122,14 +141,19 @@
          <div class="room-name">
             <script>document.write(`${sanitisedRoomName}`)</script>
          </div>
+         <input id="name" class="textbox" placeholder="Enter Name"/>
          <div id="no-stream">No presentation currently</div>
+         
          <div id="join-button" class="join-button hidden">Join Presentation</div>
+        
       </div>
       <script>
          if (window.config.owner == 'true') {
            document.querySelector('#splash').classList.add('hidden');
          }
          
+        let name;
+
          const connection = new RTCMultiConnection();
          connection.autoCreateMediaElement = false;
          connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -220,6 +244,8 @@
               <a-entity mixin="arm" position="-0.3 -0.25 0" rotation="0 0 -10"></a-entity>
               <a-entity mixin="arm" position="0.3 -0.25 0" rotation="0 0 10"></a-entity>
             </a-entity>
+            <-- Name. -->
+            <a-text class="person-name" look-at="#rig" value="Owner" align="center" color="black" position="0 0.396 0"></a-entity>
          </script>
          <script id="bob-animation" type="text/html-template">
             <a-animation attribute="position" direction="alternate" dur="2000" to="0 0.2 0"
@@ -254,8 +280,9 @@
       </a-assets>
       <!-- Avatar. -->
       <a-entity id="rig" random-position-at="selector: .chair; offset: 0 1.4 0.2"
-         firebase-broadcast="components: position, raise-the-roof, rotation" raise-the-roof="false" rotation="0 180 0">
+         firebase-broadcast="components: position, raise-the-roof, person-name, rotation" raise-the-roof="false" person-name="Default" rotation="0 180 0">
          <a-camera id="camera" position="0 0 0" wasd-controls-enabled="false"></a-camera>
+         <!-- <a-camera id="camera" position="0 0 0" ></a-camera> -->
          <a-entity id="head" mixin="avatar"
             rotation="0 180 0" 
             look-controls firebase-broadcast="componentsOnce: mixin;
@@ -298,7 +325,9 @@
          }
          
          startButton.addEventListener('click', function (e) {
-           if (streamActive) {
+           name = document.querySelector('#name').value;
+
+           if (streamActive) {            
              document.querySelector('#splash').classList.add('hidden');
              playVideo(streamEvent);
            }
